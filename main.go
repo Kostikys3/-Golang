@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// ПРЕОБРАЗОВАНИЕ РИМСКИМ ЧИСЕЛ В АРАБСКИЕ
+// ПРЕОБРАЗОВАНИЕ РИМСКИХ ЧИСЕЛ В АРАБСКИЕ
 var RomArab = map[string]int{
 	"I":    1,
 	"II":   2,
@@ -25,6 +25,13 @@ var RomArab = map[string]int{
 var ArabRom = []string{"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"}
 
 func main() {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("Ошибка:", r)
+			fmt.Println("Программа завершена из-за некорректного ввода.")
+		}
+	}()
+
 	for {
 		fmt.Println("Введите выражение (или 'ex' для выхода):")
 		var input string
@@ -40,17 +47,21 @@ func main() {
 			fmt.Println("Результат:", result)
 		}
 	}
-	fmt.Println("Программа завершена.")
 }
 
 func calculate(input string) (string, error) {
-	//Проверяем минимальную длину ввода
+	// Удаляем пробелы из ввода
+	input = strings.ReplaceAll(input, " ", "")
+
+	// Проверяем минимальную длину ввода
 	if len(input) < 3 {
-		return "", errors.New("некорректный формат ввода")
+		panic("некорректный формат ввода")
 	}
-	//Инициализация переменных
+
+	// Инициализация переменных
 	var aStr string
 	var id int
+
 	// Извлекаем первое число
 	for id = 0; id < len(input); id++ {
 		if input[id] == '+' || input[id] == '-' || input[id] == '*' || input[id] == '/' {
@@ -58,12 +69,16 @@ func calculate(input string) (string, error) {
 		}
 		aStr += string(input[id])
 	}
-	//Проверка на корректность
+
+	// Проверка на корректность
 	if len(aStr) == 0 {
-		return "", errors.New("некорректный формат ввода")
+		panic("некорректный формат ввода")
 	}
 
 	// Извлекаем оператор
+	if id == len(input) {
+		panic("не найден оператор")
+	}
 	operator := string(input[id])
 
 	// Извлекаем второе число
@@ -71,8 +86,9 @@ func calculate(input string) (string, error) {
 	for id++; id < len(input); id++ {
 		bStr += string(input[id])
 	}
+
 	if len(bStr) == 0 {
-		return "", errors.New("некорректный формат ввода")
+		panic("некорректный формат ввода")
 	}
 
 	// Проверяем, является ли первое число римским
@@ -91,17 +107,22 @@ func calculate(input string) (string, error) {
 		a, errA = strconv.Atoi(aStr)
 		b, errB = strconv.Atoi(bStr)
 	} else {
-		return "", errors.New("невозможно выполнить операцию между римским и арабским числами")
+		panic("невозможно выполнить операцию между римским и арабским числами")
 	}
 
 	if errA != nil || errB != nil {
-		return "", errors.New("некорректный ввод чисел или оператора")
+		panic("некорректный ввод чисел или оператора")
+	}
+
+	// Проверяем, что числа находятся в диапазоне от 1 до 10 включительно
+	if (a < 1 || a > 10) || (b < 1 || b > 10) {
+		panic("числа должны быть в диапазоне от 1 до 10 включительно")
 	}
 
 	// Выполняем операцию
 	result, err := performOperation(a, b, operator)
 	if err != nil {
-		return "", err
+		panic(err.Error())
 	}
 
 	// Если оба числа были римскими, конвертируем результат в римские числа
@@ -177,8 +198,7 @@ func arabicToRoman(arabic int) (string, error) {
 	numeralMap := []struct {
 		Value  int
 		Symbol string
-	}{
-		{1000, "M"}, {900, "CM"}, {500, "D"}, {400, "CD"},
+	}{ //Отношения ри
 		{100, "C"}, {90, "XC"}, {50, "L"}, {40, "XL"},
 		{10, "X"}, {9, "IX"}, {5, "V"}, {4, "IV"}, {1, "I"},
 	}
@@ -192,3 +212,4 @@ func arabicToRoman(arabic int) (string, error) {
 
 	return result.String(), nil
 }
+
