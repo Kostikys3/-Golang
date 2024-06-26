@@ -40,7 +40,7 @@ func main() {
 			break
 		}
 
-		result, err := calculate(input)
+		result, err := calculate(input) // FUNC calculate
 		if err != nil {
 			fmt.Println("Ошибка:", err)
 		} else {
@@ -91,7 +91,7 @@ func calculate(input string) (string, error) {
 		panic("некорректный формат ввода")
 	}
 
-	// Проверяем, является ли первое число римским
+	// Проверяем, является ли первое число римским FUNC isRomanNumeral
 	isRomanA := isRomanNumeral(aStr)
 	isRomanB := isRomanNumeral(bStr)
 
@@ -99,7 +99,7 @@ func calculate(input string) (string, error) {
 	var errA, errB error
 
 	if isRomanA && isRomanB {
-		// Если оба числа римские, конвертируем их в арабские
+		//если оба числа римские, конвектируем их в арабские FUNC arabicToRoman
 		a, errA = romanToArabic(aStr)
 		b, errB = romanToArabic(bStr)
 	} else if !isRomanA && !isRomanB {
@@ -119,13 +119,13 @@ func calculate(input string) (string, error) {
 		panic("числа должны быть в диапазоне от 1 до 10 включительно")
 	}
 
-	// Выполняем операцию
+	//выполнение операции FUNC performOperation
 	result, err := performOperation(a, b, operator)
 	if err != nil {
 		panic(err.Error())
 	}
 
-	// Если оба числа были римскими, конвертируем результат в римские числа
+	// если оба числа быцли римскими конвектируем результат в римское число FUNC arabicToRoman
 	if isRomanA && isRomanB {
 		return arabicToRoman(result)
 	}
